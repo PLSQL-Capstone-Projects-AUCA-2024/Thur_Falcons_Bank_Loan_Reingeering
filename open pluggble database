@@ -1,0 +1,14 @@
+
+open pluggble database
+
+
+alter pluggble database thur_falcons_loan_reingeriing open;
+
+show pdbs;
+
+
+
+alter session set container=thur_falcons_loan_reingeriing;
+
+
+~~sql
