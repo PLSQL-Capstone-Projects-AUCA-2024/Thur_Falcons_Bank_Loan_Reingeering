@@ -86,7 +86,7 @@ CREATE TABLE Branch (
 
 ###Customer Table
 
-```sql
+```
 CREATE TABLE Customer (
   customerID INT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -96,3 +96,75 @@ CREATE TABLE Customer (
   nationalID VARCHAR(20) UNIQUE NOT NULL,
   CSI_score INT NOT NULL
 );
+```
+LoanApplication Table
+
+```
+CREATE TABLE LoanApplication (
+  applicationID INT PRIMARY KEY,
+  customerID INT NOT NULL,
+  loanAmount DECIMAL(15, 2) NOT NULL,
+  applicationDate DATE NOT NULL,
+  status VARCHAR(50) NOT NULL,
+  branchID INT NOT NULL,
+  documentLinks VARCHAR(255),
+  CONSTRAINT fk_LoanApplication_Customer FOREIGN KEY (customerID) REFERENCES Customer(customerID),
+  CONSTRAINT fk_LoanApplication_Branch FOREIGN KEY (branchID) REFERENCES Branch(branchID)
+);
+```
+Loan Table
+```
+CREATE TABLE Loan (
+  loanID INT PRIMARY KEY,
+  applicationID INT NOT NULL,
+  loanAmount DECIMAL(15, 2) NOT NULL,
+  interestRate FLOAT NOT NULL,
+  termMonths INT NOT NULL,
+  approvalDate DATE NOT NULL,
+  fundingDate DATE NOT NULL,
+  loanStatus VARCHAR(50) NOT NULL,
+  CONSTRAINT fk_Loan_Application FOREIGN KEY (applicationID) REFERENCES LoanApplication(applicationID)
+);
+Feedback Table
+sql
+Copy code
+CREATE TABLE Feedback (
+  feedbackID INT PRIMARY KEY,
+  customerID INT NOT NULL,
+  loanID INT NOT NULL,
+  score INT NOT NULL,
+  comments VARCHAR(255),
+  feedbackDate DATE NOT NULL,
+  CONSTRAINT fk_Feedback_Customer FOREIGN KEY (customerID) REFERENCES Customer(customerID),
+  CONSTRAINT fk_Feedback_Loan FOREIGN KEY (loanID) REFERENCES Loan(loanID)
+);
+Additional Tables
+Other tables like ApplicationProcessing, CreditCheck, and FinancialLoss can be similarly defined. See full database schema.
+
+2. Insert Sample Data
+sql
+Copy code
+INSERT INTO Branch (branchID, branchName, location, phone)
+VALUES (1, 'Kigali Branch', 'Kigali, Rwanda', '+250788000000');
+
+INSERT INTO Customer (customerID, name, address, phone, email, nationalID, CSI_score)
+VALUES (1, 'John Doe', 'Kigali', '+250788111222', 'johndoe@example.com', '119900123456789', 75);
+3. Create a Pluggable Database
+sql
+Copy code
+CREATE PLUGGABLE DATABASE Thur_Falcons_Bank
+ADMIN USER admin IDENTIFIED BY Password123
+FILE_NAME_CONVERT = ('/u01/app/oracle/oradata/pdbseed/',
+                     '/u01/app/oracle/oradata/Thur_Falcons_Bank/');
+Use Case Scenarios
+Scenario 1: Loan Application Submission
+A customer submits a loan application.
+The system performs credit checks and processes the application.
+If approved, the loan details are stored in the Loan table.
+Scenario 2: Feedback Collection
+Customers provide feedback after receiving a loan.
+The feedback is analyzed to improve service.
+Future Enhancements
+Integration with AI-powered credit scoring systems.
+Implementation of machine learning for customer feedback analysis.
+Deployment of mobile and web interfaces for self-service.
