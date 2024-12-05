@@ -158,15 +158,17 @@ ADMIN USER admin IDENTIFIED BY Password123
 FILE_NAME_CONVERT = ('/u01/app/oracle/oradata/pdbseed/',
                      '/u01/app/oracle/oradata/Thur_Falcons_Bank/');
 ```
-### Use Case Scenarios
-Scenario 1: Loan Application Submission
-A customer submits a loan application.
-The system performs credit checks and processes the application.
-If approved, the loan details are stored in the Loan table.
-Scenario 2: Feedback Collection
-Customers provide feedback after receiving a loan.
-The feedback is analyzed to improve service.
-Future Enhancements
-Integration with AI-powered credit scoring systems.
-Implementation of machine learning for customer feedback analysis.
-Deployment of mobile and web interfaces for self-service.
+# Use Case Scenarios
+## Scenario 1:
+### Loan Application Submission
+###A customer submits a loan application.
+###The system performs credit checks and processes the application.
+###If approved, the loan details are stored in the Loan table.
+##Scenario 2: 
+### Feedback Collection
+### Customers provide feedback after receiving a loan.
+### The feedback is analyzed to improve service.
+# Future Enhancements
+### Integration with AI-powered credit scoring systems.
+### Implementation of machine learning for customer feedback analysis.
+### Deployment of mobile and web interfaces for self-service.
