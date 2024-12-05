@@ -72,9 +72,9 @@ The project employs a relational database model. Below are the core entities and
 
 Below are the SQL scripts for creating the database schema, inserting sample data, and setting up a pluggable Oracle database.
 
-### 1. Create Tables
+## Create Tables
 
-#### `Branch` Table
+### `Branch` Table
 ```sql
 CREATE TABLE Branch (
   branchID INT PRIMARY KEY,
@@ -86,7 +86,7 @@ CREATE TABLE Branch (
 
 ###Customer Table
 
-```
+```sql
 CREATE TABLE Customer (
   customerID INT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -97,9 +97,9 @@ CREATE TABLE Customer (
   CSI_score INT NOT NULL
 );
 ```
-LoanApplication Table
+## LoanApplication Table
 
-```
+```sql
 CREATE TABLE LoanApplication (
   applicationID INT PRIMARY KEY,
   customerID INT NOT NULL,
@@ -112,8 +112,8 @@ CREATE TABLE LoanApplication (
   CONSTRAINT fk_LoanApplication_Branch FOREIGN KEY (branchID) REFERENCES Branch(branchID)
 );
 ```
-Loan Table
-```
+## Loan Table
+```sql
 CREATE TABLE Loan (
   loanID INT PRIMARY KEY,
   applicationID INT NOT NULL,
@@ -125,8 +125,9 @@ CREATE TABLE Loan (
   loanStatus VARCHAR(50) NOT NULL,
   CONSTRAINT fk_Loan_Application FOREIGN KEY (applicationID) REFERENCES LoanApplication(applicationID)
 );
-Feedback Table
-sql
+```
+## Feedback Table
+```sql
 Copy code
 CREATE TABLE Feedback (
   feedbackID INT PRIMARY KEY,
@@ -138,25 +139,26 @@ CREATE TABLE Feedback (
   CONSTRAINT fk_Feedback_Customer FOREIGN KEY (customerID) REFERENCES Customer(customerID),
   CONSTRAINT fk_Feedback_Loan FOREIGN KEY (loanID) REFERENCES Loan(loanID)
 );
-Additional Tables
+```
+### Additional Tables
 Other tables like ApplicationProcessing, CreditCheck, and FinancialLoss can be similarly defined. See full database schema.
 
-2. Insert Sample Data
-sql
-Copy code
+## Insert Sample Data
+```sql
 INSERT INTO Branch (branchID, branchName, location, phone)
 VALUES (1, 'Kigali Branch', 'Kigali, Rwanda', '+250788000000');
 
 INSERT INTO Customer (customerID, name, address, phone, email, nationalID, CSI_score)
 VALUES (1, 'John Doe', 'Kigali', '+250788111222', 'johndoe@example.com', '119900123456789', 75);
-3. Create a Pluggable Database
-sql
-Copy code
+```
+## Create a Pluggable Database
+```sql
 CREATE PLUGGABLE DATABASE Thur_Falcons_Bank
 ADMIN USER admin IDENTIFIED BY Password123
 FILE_NAME_CONVERT = ('/u01/app/oracle/oradata/pdbseed/',
                      '/u01/app/oracle/oradata/Thur_Falcons_Bank/');
-Use Case Scenarios
+```
+### Use Case Scenarios
 Scenario 1: Loan Application Submission
 A customer submits a loan application.
 The system performs credit checks and processes the application.
