@@ -189,10 +189,10 @@ BEGIN
 END;  
 /  
 ```
-ii. Compound Triggers
+## Compound Triggers
 A compound trigger ensures transactional consistency for multi-row operations in the LoanApplication table.
 
-```
+```sql
 CREATE OR REPLACE TRIGGER loan_application_trigger  
 FOR INSERT OR UPDATE OR DELETE ON LoanApplication  
 COMPOUND TRIGGER  
@@ -200,20 +200,24 @@ COMPOUND TRIGGER
   TYPE application_row IS RECORD (  
     applicationID LoanApplication.applicationID%TYPE,  
     status LoanApplication.status%TYPE  
-  );  
-  application_changes SYS_REFCURSOR;  
+  );
+```  
+  ## application_changes SYS_REFCURSOR;  
 
-BEFORE EACH ROW IS  
+#### BEFORE EACH ROW IS  
 BEGIN  
   -- Audit changes before any row modification  
-  INSERT INTO AuditLog (action, applicationID, old_status, new_status, timestamp)  
+ ```sql
+ INSERT INTO AuditLog (action, applicationID, old_status, new_status, timestamp)  
   VALUES ('BEFORE UPDATE', :OLD.applicationID, :OLD.status, :NEW.status, SYSDATE);  
-END BEFORE EACH ROW;  
+END BEFORE EACH ROW;
+```  
 
-AFTER EACH ROW IS  
+#### AFTER EACH ROW IS  
 BEGIN  
   -- Process status changes after the operation  
   IF :NEW.status = 'Approved' THEN  
+    ```sql
     INSERT INTO Loan (applicationID, loanAmount, approvalDate, loanStatus)  
     VALUES (:NEW.applicationID, :NEW.loanAmount, SYSDATE, 'Active');  
   END IF;  
@@ -223,10 +227,10 @@ END loan_application_trigger;
 /  
 
 ```
-b) Cursor Usage
+### Cursor Usage
 Explicit cursors are implemented for batch updates and row-by-row processing scenarios.
 
-```
+```sql
 CREATE OR REPLACE PROCEDURE update_loan_status IS  
   CURSOR loan_cursor IS  
     SELECT loanID, loanStatus FROM Loan WHERE loanStatus = 'Pending';  
