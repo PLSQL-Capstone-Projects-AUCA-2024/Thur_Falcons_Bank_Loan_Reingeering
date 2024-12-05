@@ -128,7 +128,7 @@ CREATE TABLE Loan (
 ```
 ## Feedback Table
 ```sql
-Copy code
+ 
 CREATE TABLE Feedback (
   feedbackID INT PRIMARY KEY,
   customerID INT NOT NULL,
@@ -288,7 +288,7 @@ COMMIT;
 Implementation Code
 DDL Example: Creating Tables
 sql
-Copy code
+ 
 CREATE TABLE Customers (  
   customerID INT PRIMARY KEY,  
   name VARCHAR(100),  
