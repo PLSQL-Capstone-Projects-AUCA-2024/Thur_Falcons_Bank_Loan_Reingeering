@@ -324,23 +324,23 @@ END;
 
 
 
-Scope and Limitations
-Scope
-Enforcing business rules through triggers.
-Modularizing logic with functions and packages.
-Automating workflows with cursors and triggers.
-Monitoring database activity via auditing.
-Limitations
-Complex triggers may impact performance.
-Explicit cursors are less efficient for bulk operations.
-Documentation and Demonstration
-Testing Plan
-Validate triggers by simulating valid and invalid transactions.
-Test functions with edge cases for interest rate computation.
-Verify cursor-based batch updates.
-Demonstrate audit logs for all sensitive data changes.
-Code Implementation
-Full SQL scripts for table creation, data insertion, and PL/SQL components can be found on GitHub:
+## Scope and Limitations
+### Scope
+##### 1.Enforcing business rules through triggers.
+##### 2.Modularizing logic with functions and packages.
+##### 3.Automating workflows with cursors and triggers.
+#### 4.Monitoring database activity via auditing.
+##Limitations
+##### Complex triggers may impact performance.
+##### Explicit cursors are less efficient for bulk operations.
+##### Documentation and Demonstration
+## Testing Plan
+##### Validate triggers by simulating valid and invalid transactions.
+##### Test functions with edge cases for interest rate computation.
+##### Verify cursor-based batch updates.
+##### Demonstrate audit logs for all sensitive data changes.
+## Code Implementation
+####Full SQL scripts for table creation, data insertion, and PL/SQL components can be found on GitHub:
 
 
 Author: Thur Falcons Team
