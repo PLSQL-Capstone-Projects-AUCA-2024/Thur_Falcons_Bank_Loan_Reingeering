@@ -82,10 +82,11 @@ CREATE TABLE Branch (
   location VARCHAR(100) NOT NULL,
   phone VARCHAR(20) NOT NULL
 );
+```
 
 ###Customer Table
 
-
+```sql
 CREATE TABLE Customer (
   customerID INT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
