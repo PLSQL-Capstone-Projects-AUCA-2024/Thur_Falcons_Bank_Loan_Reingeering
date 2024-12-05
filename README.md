@@ -162,55 +162,53 @@ FILE_NAME_CONVERT = ('/u01/app/oracle/oradata/pdbseed/',
 
 # PHASE 6
 ## Database Interaction and Transactions
-## Database Operations
-1. Cross Joins
+### Database Operations
+#### Cross Joins
 A cross join combines all rows from two tables, resulting in a Cartesian product.
-```
--- Example: Cross join between Customers and LoanApplications
+```sql
+-- Cross join between Customers and LoanApplications
 SELECT Customers.customerID, Customers.name, LoanApplications.applicationID, LoanApplications.loanAmount  
 FROM Customers  
 CROSS JOIN LoanApplications;  
 
 ```
-Use Case: Generate all possible combinations of customers and loan applications for analysis.
-
-2. Inner Joins
-An inner join retrieves only matching records from both tables based on a specific condition.
-```
--- Example: Inner join between Customers and LoanApplications
+## Inner Joins
+#### An inner join retrieves only matching records from both tables based on a specific condition.
+```sql
+-- Inner join between Customers and LoanApplications
 SELECT Customers.customerID, Customers.name, LoanApplications.loanAmount  
 FROM Customers  
 INNER JOIN LoanApplications  
 ON Customers.customerID = LoanApplications.customerID;  
 
 ```
-Use Case: Find loan applications submitted by specific customers.
+ Find loan applications submitted by specific customers.
 
-3. Outer Joins
-3.1 Left Outer Join
-Retrieves all records from the left table and matching records from the right table.
-```
--- Example: Left join between Customers and LoanApplications
+## Outer Joins
+### Left Outer Join
+#### Retrieves all records from the left table and matching records from the right table.
+```sql
+-- Left join between Customers and LoanApplications
 SELECT Customers.customerID, Customers.name, LoanApplications.loanAmount  
 FROM Customers  
 LEFT JOIN LoanApplications  
 ON Customers.customerID = LoanApplications.customerID;  
 
 ```
-3.2 Right Outer Join
-Retrieves all records from the right table and matching records from the left table.
-```
--- Example: Right join between Customers and LoanApplications
+### Right Outer Join
+#### Retrieves all records from the right table and matching records from the left table.
+```sql
+-- Right join between Customers and LoanApplications
 SELECT Customers.customerID, Customers.name, LoanApplications.loanAmount  
 FROM Customers  
 RIGHT JOIN LoanApplications  
 ON Customers.customerID = LoanApplications.customerID;  
 ```
-3.3 Full Outer Join
-Retrieves all records from both tables, whether they have matching rows or not.
+## Full Outer Join
+#### Retrieves all records from both tables, whether they have matching rows or not.
 
-```
--- Example: Full outer join between Customers and LoanApplications
+```sql
+-- Full outer join between Customers and LoanApplications
 SELECT Customers.customerID, Customers.name, LoanApplications.loanAmount  
 FROM Customers  
 FULL OUTER JOIN LoanApplications  
@@ -218,45 +216,45 @@ ON Customers.customerID = LoanApplications.customerID;
 ```
 Use Case: Find customers who have applied for loans and customers who haven’t, as well as applications with no associated customer records.
 
-4. Other Join Types
-Self Join
-A self join allows a table to be joined to itself.
+## Other Join Types
+### Self Join
+#### A self join allows a table to be joined to itself.
 
-```
--- Example: Self join to compare loan amounts within the same table
+```sql
+-- Self join to compare loan amounts within the same table
 SELECT A.loanID AS Loan1, B.loanID AS Loan2, A.loanAmount, B.loanAmount  
 FROM Loan A, Loan B  
 WHERE A.loanAmount > B.loanAmount;  
 ```
-Natural Join
-Automatically joins tables based on columns with the same name and compatible data types.
+## Natural Join
+#### Automatically joins tables based on columns with the same name and compatible data types.
 
-sql
-Copy code
--- Example: Natural join between Customers and LoanApplications
+
+```sql
+--  Natural join between Customers and LoanApplications
 SELECT *  
 FROM Customers  
-NATURAL JOIN LoanApplications;  
-Transaction Management
+NATURAL JOIN LoanApplications;
+``` 
+#### Transaction Management
 Ensuring Consistency and Reliability
 Transaction Example
 A transaction ensures atomicity, consistency, isolation, and durability (ACID).
 
-sql
-Copy code
--- Example: Transaction to process a loan application and update customer status
+```sql
+-- Transaction to process a loan application and update customer status
 BEGIN TRANSACTION;  
 
 -- Step 1: Insert a new loan application
 INSERT INTO LoanApplications (applicationID, customerID, loanAmount, status)  
 VALUES (101, 1, 5000, 'Pending');  
 
--- Step 2: Update the customer’s account status
+--  Update the customer’s account status
 UPDATE Customers  
 SET accountStatus = 'Loan Processing'  
 WHERE customerID = 1;  
 
--- Step 3: Commit the transaction if successful
+--  Commit the transaction if successful
 COMMIT;  
 
 -- Rollback the transaction if any error occurs
@@ -264,24 +262,21 @@ EXCEPTION
 WHEN OTHERS THEN  
   ROLLBACK;  
 END;  
-/  
-Savepoints
-Savepoints allow partial rollback within a transaction.
+/
+```
+### Savepoints
+#### Savepoints allow partial rollback within a transaction.
 
-sql
-Copy code
+```sql
 BEGIN TRANSACTION;  
 
-SAVEPOINT Step1;  
-
--- Step 1: Update customer account balance
+--  Update customer account balance
 UPDATE Customers  
 SET accountBalance = accountBalance - 200  
 WHERE customerID = 1;  
 
-SAVEPOINT Step2;  
 
--- Step 2: Insert a new loan disbursement
+--  Insert a new loan disbursement
 INSERT INTO Loan (loanID, customerID, loanAmount, disbursementDate, loanStatus)  
 VALUES (201, 1, 5000, SYSDATE, 'Active');  
 
@@ -318,6 +313,8 @@ CREATE TABLE Loan (
   FOREIGN KEY (customerID) REFERENCES Customers(customerID)  
 );  
 
+### Auditing table
+```sql
 CREATE TABLE AuditLog (  
   logID INT PRIMARY KEY,  
   action VARCHAR(50),  
@@ -326,15 +323,17 @@ CREATE TABLE AuditLog (
   new_value VARCHAR(200),  
   modified_by VARCHAR(50),  
   timestamp DATE  
-);  
-Sample Data Insertion
-sql
-Copy code
+);
+``` 
+## Sample Data Insertion
+
+```sql
 INSERT INTO Customers (customerID, name, accountBalance, accountStatus)  
 VALUES (1, 'John Doe', 1000, 'Active');  
 
 INSERT INTO LoanApplications (applicationID, customerID, loanAmount, status)  
-VALUES (1, 1, 5000, 'Pending');  
+VALUES (1, 1, 5000, 'Pending');
+```  
 
 
 
