@@ -149,7 +149,7 @@ INSERT INTO Branch (branchID, branchName, location, phone)
 VALUES (1, 'Kigali Branch', 'Kigali, Rwanda', '+250788000000');
 
 INSERT INTO Customer (customerID, name, address, phone, email, nationalID, CSI_score)
-VALUES (1, 'John Doe', 'Kigali', '+250788111222', 'johndoe@example.com', '119900123456789', 75);
+VALUES (1, 'Shema Ken', 'Kigali', '+250788111222', 'kenshema@gmail.com', '079023456789', 75);
 ```
 ## Create a Pluggable Database
 ```sql
