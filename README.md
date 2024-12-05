@@ -158,6 +158,155 @@ ADMIN USER admin IDENTIFIED BY Password123
 FILE_NAME_CONVERT = ('/u01/app/oracle/oradata/pdbseed/',
                      '/u01/app/oracle/oradata/Thur_Falcons_Bank/');
 ```
+
+Problem Statement
+The loan origination process at BPR Bank is inefficient, leading to delays, financial losses, and data inconsistencies. Key challenges include:
+
+Enforcing business rules to prevent invalid loan applications.
+Ensuring transactional integrity during loan approval.
+Automating workflows to reduce manual interventions.
+Monitoring sensitive data changes for accountability.
+Justification for Advanced Techniques
+Triggers: Automate business rules and workflows, ensuring real-time enforcement of data integrity.
+Cursors: Facilitate row-by-row processing for scenarios like batch updates or approval.
+Functions: Modularize calculations (e.g., interest rate computation).
+Packages: Enhance code organization, reusability, and security.
+Auditing: Track user actions and log sensitive data changes, ensuring accountability.
+Features and Implementation
+a) Trigger Implementation
+Triggers are used to enforce business rules, maintain data integrity, and automate workflows.
+
+i. Simple Triggers
+A BEFORE INSERT trigger ensures no loan is processed without a valid credit check.
+```
+CREATE OR REPLACE TRIGGER before_loan_insert  
+BEFORE INSERT ON loan  
+FOR EACH ROW  
+BEGIN  
+  IF NOT EXISTS (SELECT 1 FROM CreditCheck WHERE applicationID = :NEW.applicationID) THEN  
+    RAISE_APPLICATION_ERROR(-20001, 'Loan cannot be processed without a credit check.');  
+  END IF;  
+END;  
+/  
+```
+ii. Compound Triggers
+A compound trigger ensures transactional consistency for multi-row operations in the LoanApplication table.
+
+```
+CREATE OR REPLACE TRIGGER loan_application_trigger  
+FOR INSERT OR UPDATE OR DELETE ON LoanApplication  
+COMPOUND TRIGGER  
+
+  TYPE application_row IS RECORD (  
+    applicationID LoanApplication.applicationID%TYPE,  
+    status LoanApplication.status%TYPE  
+  );  
+  application_changes SYS_REFCURSOR;  
+
+BEFORE EACH ROW IS  
+BEGIN  
+  -- Audit changes before any row modification  
+  INSERT INTO AuditLog (action, applicationID, old_status, new_status, timestamp)  
+  VALUES ('BEFORE UPDATE', :OLD.applicationID, :OLD.status, :NEW.status, SYSDATE);  
+END BEFORE EACH ROW;  
+
+AFTER EACH ROW IS  
+BEGIN  
+  -- Process status changes after the operation  
+  IF :NEW.status = 'Approved' THEN  
+    INSERT INTO Loan (applicationID, loanAmount, approvalDate, loanStatus)  
+    VALUES (:NEW.applicationID, :NEW.loanAmount, SYSDATE, 'Active');  
+  END IF;  
+END AFTER EACH ROW;  
+
+END loan_application_trigger;  
+/  
+
+```
+b) Cursor Usage
+Explicit cursors are implemented for batch updates and row-by-row processing scenarios.
+
+```
+CREATE OR REPLACE PROCEDURE update_loan_status IS  
+  CURSOR loan_cursor IS  
+    SELECT loanID, loanStatus FROM Loan WHERE loanStatus = 'Pending';  
+  loan_rec loan_cursor%ROWTYPE;  
+BEGIN  
+  OPEN loan_cursor;  
+  LOOP  
+    FETCH loan_cursor INTO loan_rec;  
+    EXIT WHEN loan_cursor%NOTFOUND;  
+
+    UPDATE Loan SET loanStatus = 'Processed' WHERE loanID = loan_rec.loanID;  
+  END LOOP;  
+  CLOSE loan_cursor;  
+END;  
+/  
+```
+c) Attributes and Functions
+Functions encapsulate logic for specific tasks like interest rate calculation.
+
+```
+CREATE OR REPLACE FUNCTION calculate_interest(  
+  p_loanAmount IN NUMBER,  
+  p_interestRate IN FLOAT  
+) RETURN NUMBER IS  
+BEGIN  
+  RETURN (p_loanAmount * p_interestRate) / 100;  
+END calculate_interest;  
+/  
+```
+Using %ROWTYPE for dynamic data processing:
+```
+DECLARE  
+  loan_rec Loan%ROWTYPE;  
+BEGIN  
+  SELECT * INTO loan_rec FROM Loan WHERE loanID = 101;  
+  DBMS_OUTPUT.PUT_LINE('Loan Amount: ' || loan_rec.loanAmount);  
+END;  
+/  
+```
+d) Package Development
+Packages organize related procedures and functions.
+
+```
+CREATE OR REPLACE PACKAGE loan_package IS  
+  PROCEDURE approve_loan(p_applicationID INT);  
+  FUNCTION get_loan_status(p_loanID INT) RETURN VARCHAR2;  
+END loan_package;  
+/  
+
+CREATE OR REPLACE PACKAGE BODY loan_package IS  
+  PROCEDURE approve_loan(p_applicationID INT) IS  
+  BEGIN  
+    UPDATE LoanApplication  
+    SET status = 'Approved'  
+    WHERE applicationID = p_applicationID;  
+  END;  
+
+  FUNCTION get_loan_status(p_loanID INT) RETURN VARCHAR2 IS  
+    loan_status VARCHAR2(50);  
+  BEGIN  
+    SELECT loanStatus INTO loan_status FROM Loan WHERE loanID = p_loanID;  
+    RETURN loan_status;  
+  END;  
+END loan_package;  
+/  
+
+```
+e) Auditing Mechanisms
+Auditing ensures tracking of sensitive data changes.
+
+```
+CREATE OR REPLACE TRIGGER audit_trigger  
+AFTER UPDATE ON Customer  
+FOR EACH ROW  
+BEGIN  
+  INSERT INTO AuditLog (action, table_name, old_value, new_value, modified_by, timestamp)  
+  VALUES ('UPDATE', 'Customer', :OLD.name, :NEW.name, USER, SYSDATE);  
+END;  
+/  
+```
 ## Use Case Scenarios
 ### Scenario 1:
 ##### Loan Application Submission
@@ -172,3 +321,27 @@ FILE_NAME_CONVERT = ('/u01/app/oracle/oradata/pdbseed/',
 ##### 1.Integration with AI-powered credit scoring systems.
 ###### 2.Implementation of machine learning for customer feedback analysis.
 ###### 3.Deployment of mobile and web interfaces for self-service.
+
+
+
+Scope and Limitations
+Scope
+Enforcing business rules through triggers.
+Modularizing logic with functions and packages.
+Automating workflows with cursors and triggers.
+Monitoring database activity via auditing.
+Limitations
+Complex triggers may impact performance.
+Explicit cursors are less efficient for bulk operations.
+Documentation and Demonstration
+Testing Plan
+Validate triggers by simulating valid and invalid transactions.
+Test functions with edge cases for interest rate computation.
+Verify cursor-based batch updates.
+Demonstrate audit logs for all sensitive data changes.
+Code Implementation
+Full SQL scripts for table creation, data insertion, and PL/SQL components can be found on GitHub:
+
+
+Author: Thur Falcons Team
+Year: 2024
