@@ -84,7 +84,7 @@ CREATE TABLE Branch (
 );
 ```
 
-###Customer Table
+## Customer Table
 
 ```sql
 CREATE TABLE Customer (
@@ -159,26 +159,26 @@ FILE_NAME_CONVERT = ('/u01/app/oracle/oradata/pdbseed/',
                      '/u01/app/oracle/oradata/Thur_Falcons_Bank/');
 ```
 
-Problem Statement
-The loan origination process at BPR Bank is inefficient, leading to delays, financial losses, and data inconsistencies. Key challenges include:
+## Problem Statement
+### The loan origination process at BPR Bank is inefficient, leading to delays, financial losses, and data inconsistencies. Key challenges include:
 
-Enforcing business rules to prevent invalid loan applications.
-Ensuring transactional integrity during loan approval.
-Automating workflows to reduce manual interventions.
-Monitoring sensitive data changes for accountability.
-Justification for Advanced Techniques
-Triggers: Automate business rules and workflows, ensuring real-time enforcement of data integrity.
-Cursors: Facilitate row-by-row processing for scenarios like batch updates or approval.
-Functions: Modularize calculations (e.g., interest rate computation).
-Packages: Enhance code organization, reusability, and security.
-Auditing: Track user actions and log sensitive data changes, ensuring accountability.
-Features and Implementation
-a) Trigger Implementation
-Triggers are used to enforce business rules, maintain data integrity, and automate workflows.
+##### -Enforcing business rules to prevent invalid loan applications.
+##### -Ensuring transactional integrity during loan approval.
+##### -Automating workflows to reduce manual interventions.
+##### -Monitoring sensitive data changes for accountability.
+## Justification for Advanced Techniques
+#### -Triggers: Automate business rules and workflows, ensuring real-time enforcement of data integrity.
+#### -Cursors: Facilitate row-by-row processing for scenarios like batch updates or approval.
+#### -Functions: Modularize calculations (e.g., interest rate computation).
+#### -Packages: Enhance code organization, reusability, and security.
+#### -Auditing: Track user actions and log sensitive data changes, ensuring accountability.
+#Features and Implementation
+## Trigger Implementation
+#### Triggers are used to enforce business rules, maintain data integrity, and automate workflows.
 
-i. Simple Triggers
-A BEFORE INSERT trigger ensures no loan is processed without a valid credit check.
-```
+## Simple Triggers
+### BEFORE INSERT trigger ensures no loan is processed without a valid credit check.
+```sql
 CREATE OR REPLACE TRIGGER before_loan_insert  
 BEFORE INSERT ON loan  
 FOR EACH ROW  
@@ -213,11 +213,12 @@ BEGIN
 END BEFORE EACH ROW;
 ```  
 
-#### AFTER EACH ROW IS  
+```sql
+ AFTER EACH ROW IS  
 BEGIN  
   -- Process status changes after the operation  
   IF :NEW.status = 'Approved' THEN  
-    ```sql
+    ```
     INSERT INTO Loan (applicationID, loanAmount, approvalDate, loanStatus)  
     VALUES (:NEW.applicationID, :NEW.loanAmount, SYSDATE, 'Active');  
   END IF;  
@@ -247,10 +248,10 @@ BEGIN
 END;  
 /  
 ```
-c) Attributes and Functions
+### Attributes and Functions
 Functions encapsulate logic for specific tasks like interest rate calculation.
 
-```
+```sql
 CREATE OR REPLACE FUNCTION calculate_interest(  
   p_loanAmount IN NUMBER,  
   p_interestRate IN FLOAT  
@@ -260,8 +261,8 @@ BEGIN
 END calculate_interest;  
 /  
 ```
-Using %ROWTYPE for dynamic data processing:
-```
+### Using %ROWTYPE for dynamic data processing:
+```sql
 DECLARE  
   loan_rec Loan%ROWTYPE;  
 BEGIN  
@@ -270,23 +271,24 @@ BEGIN
 END;  
 /  
 ```
-d) Package Development
+### Package Development
 Packages organize related procedures and functions.
 
-```
+```sql
 CREATE OR REPLACE PACKAGE loan_package IS  
   PROCEDURE approve_loan(p_applicationID INT);  
   FUNCTION get_loan_status(p_loanID INT) RETURN VARCHAR2;  
-END loan_package;  
-/  
-
+END loan_package;
+```  
+  
+```sql
 CREATE OR REPLACE PACKAGE BODY loan_package IS  
   PROCEDURE approve_loan(p_applicationID INT) IS  
   BEGIN  
     UPDATE LoanApplication  
     SET status = 'Approved'  
     WHERE applicationID = p_applicationID;  
-  END;  
+  END; 
 
   FUNCTION get_loan_status(p_loanID INT) RETURN VARCHAR2 IS  
     loan_status VARCHAR2(50);  
@@ -298,10 +300,10 @@ END loan_package;
 /  
 
 ```
-e) Auditing Mechanisms
+### Auditing Mechanisms
 Auditing ensures tracking of sensitive data changes.
 
-```
+```sql
 CREATE OR REPLACE TRIGGER audit_trigger  
 AFTER UPDATE ON Customer  
 FOR EACH ROW  
