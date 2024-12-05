@@ -83,3 +83,15 @@ CREATE TABLE Branch (
   phone VARCHAR(20) NOT NULL
 );
 
+###Customer Table
+
+
+CREATE TABLE Customer (
+  customerID INT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  nationalID VARCHAR(20) UNIQUE NOT NULL,
+  CSI_score INT NOT NULL
+);
