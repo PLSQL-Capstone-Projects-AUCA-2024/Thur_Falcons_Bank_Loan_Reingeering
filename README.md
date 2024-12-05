@@ -1,90 +1,179 @@
-# Thur_Falcons_Bank_Loan_Reingeering
+Thur Falcons Bank Loan Origination Process Re-Engineering
+Welcome to the Thur Falcons Bank Loan Origination Process Re-Engineering project. This repository contains the complete implementation of a re-engineered loan origination process for BPR Bank. The goal is to streamline loan application processing, improve customer satisfaction, and minimize financial losses using optimized workflows and database integration.
 
-# BPR Bank Loan Origination Process Re-engineering
+Project Overview
+The project aims to address customer dissatisfaction and financial losses resulting from the lengthy loan application process at BPR Bank. By re-engineering the loan origination process, we strive to:
 
-This project aims to streamline the loan origination process at BPR Bank by addressing customer dissatisfaction and financial losses stemming from lengthy application processing times. By implementing business process re-engineering, we target faster application approvals, improved customer satisfaction, and a reduced financial impact from abandoned applications.
+Reduce the average time between loan application and funding (ATBLA) to 2 hours.
+Increase the Customer Satisfaction Index (CSI) to 80%.
+Minimize financial losses from abandoned applications.
+Features
+Automated Loan Application Processing: Reduces manual interventions and speeds up credit checks and compliance verification.
+Instant Notifications: Provides real-time updates to customers about application status.
+Feedback Mechanism: Tracks customer satisfaction to drive continuous improvement.
+Integrated MIS Framework: Aligns with the bank's management information systems for efficient operations.
+Key Components
+Loan Application Workflow: Re-engineered processes for faster approval and funding.
+Data Model: Optimized database schema with key entities like customers, branches, loans, financial losses, feedback, and application processing.
+Automation: Integration of automated credit checks, compliance validation, and instant funding mechanisms.
+Table of Contents
+System Architecture
+Database Design
+Entity Relationship Diagram
+Tables and Relationships
+Database Scripts
+Create Tables
+Insert Sample Data
+Pluggable Database Creation
+Use Case Scenarios
+How to Contribute
+License
+System Architecture
+This project integrates various components to streamline the loan origination process:
 
-## Project Scope
+Frontend: Interfaces for customers and bank employees.
+Backend: Implements the business logic and API endpoints.
+Database: Stores and manages data with relationships and constraints.
+Database Design
+Entity Relationship Diagram
+The database model includes key entities like:
 
-The project involves re-engineering the loan origination process within the BPR Bank's Management Information System (MIS) to reduce application processing times and improve the Customer Satisfaction Index (CSI). The specific objectives are:
+Customers
+Loan Applications
+Loans
+Financial Losses
+Feedback
+Branches
+Application Processing
+Tables and Relationships
+Each table is carefully designed to ensure data integrity and efficiency. Below are the SQL scripts for creating the tables:
 
-- **Reduce Average Time Between Loan Application and Funding (ATBLA)** to 2 hours.
-- **Increase CSI** to 80% by enhancing process efficiency and customer experience.
+Database Scripts
+Create Tables
+1. Branch Table
+sql
+Copy code
+CREATE TABLE Branch (
+    branchID INT PRIMARY KEY,
+    branchName VARCHAR(100) NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL
+);
+2. Customer Table
+sql
+Copy code
+CREATE TABLE Customer (
+    customerID INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    nationalID VARCHAR(20) UNIQUE NOT NULL,
+    CSI_score INT NOT NULL
+);
+3. LoanApplication Table
+sql
+Copy code
+CREATE TABLE LoanApplication (
+    applicationID INT PRIMARY KEY,
+    customerID INT,
+    loanAmount DECIMAL(15, 2) NOT NULL,
+    applicationDate DATE NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    branchID INT,
+    documentLinks TEXT,
+    CONSTRAINT fk_LoanApplication_customer FOREIGN KEY (customerID) REFERENCES Customer(customerID),
+    CONSTRAINT fk_LoanApplication_branch FOREIGN KEY (branchID) REFERENCES Branch(branchID)
+);
+4. Loan Table
+sql
+Copy code
+CREATE TABLE Loan (
+    loanID INT PRIMARY KEY,
+    applicationID INT,
+    loanAmount DECIMAL(15, 2) NOT NULL,
+    interestRate FLOAT NOT NULL,
+    termMonths INT NOT NULL,
+    approvalDate DATE NOT NULL,
+    fundingDate DATE NOT NULL,
+    loanStatus VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_loan_loanApplication FOREIGN KEY (applicationID) REFERENCES LoanApplication(applicationID)
+);
+5. Application Processing Table
+sql
+Copy code
+CREATE TABLE ApplicationProcessing (
+    processID INT PRIMARY KEY,
+    applicationID INT,
+    stepName VARCHAR(50) NOT NULL,
+    startTime TIMESTAMP NOT NULL,
+    endTime TIMESTAMP NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_ApplicationProcessing_loanApplication FOREIGN KEY (applicationID) REFERENCES LoanApplication(applicationID)
+);
+6. Feedback Table
+sql
+Copy code
+CREATE TABLE Feedback (
+    feedbackID INT PRIMARY KEY,
+    customerID INT,
+    loanID INT,
+    score INT NOT NULL,
+    comments VARCHAR(255),
+    feedbackDate DATE NOT NULL,
+    CONSTRAINT fk_feedback_customer FOREIGN KEY (customerID) REFERENCES Customer(customerID),
+    CONSTRAINT fk_feedback_loan FOREIGN KEY (loanID) REFERENCES Loan(loanID)
+);
+7. Financial Loss Table
+sql
+Copy code
+CREATE TABLE FinancialLoss (
+    lossID INT PRIMARY KEY,
+    applicationID INT,
+    lossAmount DECIMAL(15, 2) NOT NULL,
+    reason VARCHAR(255),
+    recordDate DATE NOT NULL,
+    CONSTRAINT fk_financialLoss_loanApplication FOREIGN KEY (applicationID) REFERENCES LoanApplication(applicationID)
+);
+Insert Sample Data
+Here's how to insert sample data into the tables:
 
----
+sql
+Copy code
+-- Insert sample data for Branch
+INSERT INTO Branch (branchID, branchName, location, phone) VALUES
+(1, 'Kigali Branch', 'Kigali City', '+250788000001');
 
-## Current vs. Future State
+-- Insert sample data for Customer
+INSERT INTO Customer (customerID, name, address, phone, email, nationalID, CSI_score) VALUES
+(1, 'John Doe', 'Kigali', '+250788000002', 'john.doe@example.com', '119900112233', 70);
+Pluggable Database Creation
+To create a pluggable database for this project, use the following Oracle SQL commands:
 
-### Current State (Before Re-engineering)
+sql
+Copy code
+-- Create Pluggable Database
+CREATE PLUGGABLE DATABASE Thur_Falcons_PDB
+  ADMIN USER admin IDENTIFIED BY admin_password
+  ROLES = (DBA)
+  DEFAULT TABLESPACE users
+  DATAFILE '/u01/app/oracle/oradata/thursday/pdb1/users01.dbf' SIZE 500M AUTOEXTEND ON;
 
-The current state process faces delays and customer dissatisfaction due to its manual, lengthy, and inefficient steps. Below is a summary of the workflow with associated entities:
+-- Open the Pluggable Database
+ALTER PLUGGABLE DATABASE Thur_Falcons_PDB OPEN;
+Use Case Scenarios
+1. Loan Application Submission
+A customer submits a loan application at a branch or digitally. The application progresses through automated processing steps for approval.
 
-1. **Customers** submit **Loan Applications** at **Branches**.
-2. **Loan Officers** manually handle **Application Processing** and check initial documents.
-3. **Credit Checks** are conducted by the Credit Reference Bureau, with results returned to the loan officer.
-4. **Quality Control Team** verifies application compliance, adding to delays.
-5. **Branch Managers** make final **Loan** decisions, impacting approval speed.
-6. Approved applications are manually logged into the **IT System** and notifications are sent to customers.
-7. **Feedback/CSI Scores** indicate low customer satisfaction due to prolonged processing times.
-8. **Financial Losses** accumulate from abandoned applications due to excessive delays.
+2. Customer Feedback Collection
+Customers provide feedback after their loan applications are processed, aiding in service improvements.
 
-This process is marked by manual interventions, multiple decision points, and prolonged approval times, leading to customer frustration and a yearly financial loss of approximately Rwf 40,000,000.
+3. Analyzing Financial Losses
+Rejected or abandoned applications are recorded in the financial loss table to assess risk and improve policies.
 
-### Future State (After Re-engineering)
-
-The re-engineered process introduces automation and streamlined workflows to achieve faster processing times, higher customer satisfaction, and reduced financial losses. Key changes include:
-
-1. **Customers** submit **Loan Applications** digitally or at **Branches**, with automated data entry.
-2. The **IT System** performs **Automated Application Processing**, including real-time checks and notifications for missing items.
-3. Integrated **Instant Credit Checks** reduce waiting times and automatically evaluate results.
-4. **Automated Quality Control** compliance checks minimize manual interventions.
-5. **Branch Managers** or the system grant quick approvals on standard **Loans**.
-6. **Instant Customer Notifications and Funding** are enabled, with a goal of reducing approval-to-funding time to 2 hours.
-7. **Feedback/CSI Scores** improve as the streamlined process enhances customer satisfaction and reduces abandoned applications.
-8. **Financial Losses** are minimized due to improved processing times and better customer retention.
-
-This new workflow eliminates many manual steps, enhances efficiency, and aligns with the MIS framework to support decision-making and organizational goals.
-
----
-
-## Key Entities
-
-The following entities are central to both the current and future state of the loan origination process:
-
-- **Customers** - Loan applicants who submit applications and receive updates.
-- **Loan Applications** - Documents and data submitted by customers for loan requests.
-- **Loans** - Approved funding provided to customers upon application approval.
-- **Financial Losses** - Losses incurred from customers abandoning applications due to delays.
-- **Application Processing** - The full workflow of verifying, checking, and approving loan applications.
-- **Branches** - Physical bank locations where customers initiate or track applications.
-- **Credit Checks** - Verification of customers' credit history by the Credit Reference Bureau.
-- **Feedback/CSI Scores** - Metrics that track customer satisfaction based on application processing experiences.
-
----
-
-## Diagrams
-
-Two **swimlane diagrams** represent the workflow before and after re-engineering:
-
-1. **Current State Diagram** - Illustrates the lengthy, manual steps and decision points leading to customer dissatisfaction.
-2. **Future State Diagram** - Showcases the re-engineered process with automation and faster processing times, resulting in enhanced customer satisfaction and minimized financial losses.
-
----
-
-## Goals and Outcomes
-
-By re-engineering the loan origination process, BPR Bank aims to:
-
-- **Enhance operational efficiency** by reducing the ATBLA to 2 hours.
-- **Improve customer experience** by raising the CSI score to 80%.
-- **Minimize financial losses** from abandoned applications, strengthening revenue.
-
----
-
-## Conclusion
-
-This re-engineering project aligns with BPR Bank's strategic goals of enhancing customer satisfaction, reducing processing times, and increasing efficiency within the MIS framework. By addressing the pain points in the current workflow, we aim to foster better customer retention, higher satisfaction scores, and a more effective loan origination process.
-
----
-
-For further details, please refer to the attached swimlane diagrams of the current and future states.
+How to Contribute
+Fork the repository.
+Clone your forked repository.
+Make your changes and commit them.
+Push your changes to your forked repository.
+Open a pull request to the main branch.
